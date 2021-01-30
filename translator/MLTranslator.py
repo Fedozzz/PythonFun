@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup as bS
 
 # function to execute the translator
 
-
 def main():
     myword = MultilingualOnlineTranslator()
     myword.translatemessage()
@@ -15,27 +14,20 @@ def main():
     else:
         print(str(myword.response.status_code) + "Some weird error")
     print('Content examples:\n')
-    print(f"{myword.targetlanguage} Translations:")
+    print(f"{myword.diclanguages[myword.targetlanguage]} Translations:")
     print_translations(myword.translations)
-    print(f"\n{myword.targetlanguage} Examples:")
+    print(f"\n{myword.diclanguages[myword.targetlanguage]} Examples:")
     print_examples(myword.examples)
 
 # I have saved one of the translations to the htm page and use it instead of calling the server every time I troubleshoot
 
 
 def test():
-    f = open('test.htm', 'r', encoding='utf-8')
-    soup = bS(f.read(), 'html.parser')
-    f.close()
-    b = []
-    a = soup.find_all('a', class_='translation')
-    for i in a:
-        if i.text:
-            word = i.text.replace("\n", "")
-            word = word.lstrip()
-            # for some weird reason word "translation" also has translate class, had to create an exception for it
-            if word != 'Translation':
-                b.append(word)
+    myword = MultilingualOnlineTranslator()
+    print(myword.translatepair)
+    myword.generatelink()
+    print(myword.translatelink)
+
 
 
 # function to print first 5 items from the list
@@ -61,25 +53,35 @@ class MultilingualOnlineTranslator:
     allwords = []
 
     def __init__(self):
-        self.source_language = input('Type "en" if you want to translate from French into English, or "fr" if you want to translate from English into French:\n')
-        self.translatedword = input('Type the word you want to translate:\n')
+        self.source_language = int(input("""Hello, you're welcome to the translator. Translator supports: 
+1. Arabic
+2. German
+3. English
+4. Spanish
+5. French
+6. Hebrew
+7. Japanese
+8. Dutch
+9. Polish
+10. Portuguese
+11. Romanian
+12. Russian
+13. Turkish
+Type the number of your language:\n"""))
+        self.targetlanguage = int(input("""Type the number of language you want to translate to: \n"""))
+        self.diclanguages = {1:"Arabic", 2:"German", 3:"English", 4:"Spanish", 5:"French", 6:"Hebrew", 7:"Japanese", 8:"Dutch", 9:"Polish", 10:"Portuguese", 11:"Romanian", 12:"Russian", 13:"Turkish"}
+        self.translatedword = input("""Type the word you want to translate:\n""").lower()
         self.translatelink = ""
         self.response = ""
         self.bscontent = ""
         self.translatepair = ""
-        self.targetlanguage = ""
         self.translations = ""
         self.examples = ""
         MultilingualOnlineTranslator.allwords.append(self)
 
     def translatemessage(self):
-        print(f'You chose "{self.source_language}" as the language to translate "{self.translatedword}" to.')
-        if self.source_language == 'en':
-            self.translatepair = 'french-english'
-            self.targetlanguage = 'English'
-        elif self.source_language == 'fr':
-            self.translatepair = 'english-french'
-            self.targetlanguage = 'French'
+        # print(f'You chose "{self.source_language}" as the language to translate "{self.translatedword}" to.')
+        self.translatepair = f"{self.diclanguages[self.source_language].lower()}-{self.diclanguages[self.targetlanguage].lower()}"
 
     def generatelink(self):
         # write a function to generate a proper link basing on init input
